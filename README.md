@@ -1,13 +1,13 @@
 # Term Deposit Uptake Prediction with Logistic Regression
 
-## Objective
+Term Deposit Uptake Prediction with Stacking Ensemble
+Objective
 
-Banks invest heavily in telemarketing to promote term deposits. This project applies **Logistic Regression** to historical campaign data so that the bank can estimate, in advance, which customers are most likely to open a term deposit.
+Banks invest heavily in telemarketing to promote term deposits. This project applies a Stacking Ensemble Learning approach—combining multiple base models—to historical campaign data so that the bank can more accurately estimate which customers are most likely to subscribe to a term deposit.
 
-## Dataset Details
+Dataset Details
 
-The data comes from the **UCI Bank Marketing dataset** — **45,211 customer records** across **17 fields**.
-
+The data comes from the UCI Bank Marketing dataset — 45,211 customer records across 17 fields.
 | Field | Kind | What it captures |
 |-------|------|------------------|
 | age | Numeric | Customer's age in years |
@@ -30,21 +30,57 @@ The data comes from the **UCI Bank Marketing dataset** — **45,211 customer rec
 
 ## Methodology
 
-**Phase 1 — Exploration:**
-Inspected data quality (no nulls, no duplicates). Plotted feature distributions — histograms for numerics, bar charts for categoricals. Examined how each attribute relates to the target via stacked proportion charts and box plots. Computed a correlation heatmap and isolated the strongest predictors.
+Phase 1 — Exploration:
 
-**Phase 2 — Preprocessing:**
-Converted binary and multi-level categorical fields into numeric codes (manual mapping for yes/no fields, `LabelEncoder` for the rest). Split the data 75 / 25 with stratification. Normalised features with `StandardScaler`.
+Inspected data quality (verified absence of missing values and duplicates). Visualised feature distributions using histograms for numerical variables and bar charts for categorical variables. Analysed relationships between predictors and the target variable through stacked proportion plots and box plots. Generated a correlation heatmap to identify linear relationships and highlight potentially important predictors.
 
-**Phase 3 — Modelling:**
-Fitted two Logistic Regression classifiers (solver: `liblinear`, C = 0.8):
-- *Standard* — equal class weights.
-- *Weighted* — `class_weight='balanced'` to compensate for the ~88 / 12 imbalance.
+Special attention was given to class imbalance (~88% “no”, ~12% “yes”), as this significantly impacts model performance and evaluation strategy.
 
-**Phase 4 — Evaluation:**
-Compared both variants on Accuracy, Precision, Recall, F1, and ROC-AUC. Plotted confusion matrices and the ROC curve. Checked robustness via 5-fold stratified cross-validation.
+Phase 2 — Preprocessing:
 
-## Findings
+Transformed categorical variables into numerical representations:
+
+Binary features (e.g., yes/no) were manually encoded (0/1)
+Multi-class categorical variables were encoded using LabelEncoder
+
+Split the dataset into training (75%) and testing (25%) sets using stratified sampling to preserve class distribution.
+
+Applied feature scaling using StandardScaler to normalise numerical features, ensuring compatibility with models sensitive to feature magnitude.
+
+Phase 3 — Modelling (Stacking Ensemble):
+
+Implemented a Stacking Ensemble model, which combines multiple base learners to improve predictive performance.
+
+🔹 Base Models:
+Logistic Regression
+Decision Tree
+Random Forest
+🔹 Meta-Model:
+Logistic Regression used as the final estimator to combine predictions from base models.
+
+Two configurations were tested:
+
+Standard Stacking Model — trained on original data
+Balanced Stacking Model — incorporated class imbalance handling (via class weights or resampling)
+
+This approach leverages:
+
+Linear relationships (Logistic Regression)
+Non-linear patterns (Decision Tree)
+Robust ensemble learning (Random Forest)
+Phase 4 — Evaluation:
+
+Evaluated model performance using multiple metrics:
+
+Accuracy
+Precision
+Recall
+F1-score
+ROC-AUC
+
+Generated confusion matrices and plotted the ROC curve to assess classification performance visually.
+
+To ensure model robustness and generalisation, performed 5-fold stratified cross-validation, maintaining consistent class distribution across folds.
 
 1. **Imbalance effect** — ~88 % of customers did not subscribe, so high accuracy alone does not mean the model is useful; recall and AUC matter more.
 2. **Call duration dominates** — the length of the last marketing call is, by far, the strongest predictor of conversion.
